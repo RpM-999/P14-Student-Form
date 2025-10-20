@@ -1,0 +1,9 @@
+streamlit
+supabase
+gspread
+google-auth
+facenet-pytorch
+torch
+torchvision
+Pillow
+numpy
