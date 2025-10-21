@@ -69,7 +69,7 @@ def show_registration_form():
         img_left = col_img2.camera_input("2. Left View", key="cam_left")
         img_right = col_img3.camera_input("3. Right View", key="cam_right")
 
-        submit_button = st.form_submit_button("Submit Registration")
+    submit_button = st.form_submit_button("Submit Registration")
 
     
     if submit_button:
