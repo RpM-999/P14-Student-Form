@@ -8,7 +8,7 @@ from connection_db import supabase
 from utils.face_embedding import get_face_embedding
 from utils.g_spread import connect_to_gsheet, write_to_sheet
 
-# --- 1. Initialize Google Sheet Connection ---
+
 try:
     sheet = connect_to_gsheet()
     if sheet is None:
@@ -18,7 +18,6 @@ except Exception as e:
     st.error(f"Error connecting to registration database: {e}")
     st.stop()
 
-# --- 2. Function to get dynamic department list ---
 @st.cache_data(ttl=600) # Cache the list for 10 minutes
 def get_department_list():
     """Fetches department names from the Supabase 'department' table."""
@@ -30,7 +29,6 @@ def get_department_list():
         st.error(f"Could not fetch department list: {e}")
         return ["Error: Could not load departments"]
 
-# --- 3. The Main Registration Form Function ---
 def show_registration_form():
     st.title("🎓 New Student Registration")
     st.write("Please fill in your details and provide three clear photos of your face.")
@@ -41,7 +39,6 @@ def show_registration_form():
     with st.form("student_registration_form"):
         st.subheader("Student Details")
         
-        # --- Form Fields ---
         s_name = st.text_input("Full Name (S_name)")
         s_mail = st.text_input("Email (S_mail)")
         s_phone = st.text_input("Phone Number (S_phone)")
@@ -52,8 +49,7 @@ def show_registration_form():
         s_departname = col1.selectbox("Department (S_departname)", DEPARTMENTS)
         s_admisionYear = col2.number_input("Admission Year (S_admisionYear)",
                                           current_year - 10, current_year, current_year)
-        
-        # --- Live Face Photos ---
+    
         st.subheader("Live Face Photos")
         st.info("Provide 3 clear photos: Front, Left, and Right. (No hats or glasses)")
         
@@ -64,7 +60,7 @@ def show_registration_form():
 
         submit_button = st.form_submit_button("Submit Registration")
 
-    # --- 4. Form Submission Logic ---
+    
     if submit_button:
         all_fields = [s_name, s_mail, s_phone, s_address, s_departname, s_admisionYear, s_dob]
         all_images = [img_front, img_left, img_right]
@@ -108,7 +104,7 @@ def show_registration_form():
 # --- 5. Main "Router" Logic ---
 try:
     # Check the flag in Supabase. Assumes table has only one row with id=1
-    response = supabase.table("app_controls").select("is_registration_open").eq("id", 1).single().execute()
+    response = supabase.table("app_controls").select("is_registration_open").single().execute()
     is_open = response.data.get("is_registration_open", False)
 
     if is_open:

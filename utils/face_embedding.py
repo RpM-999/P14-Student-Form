@@ -24,7 +24,7 @@ def load_models():
         min_face_size=20,
         thresholds=[0.6, 0.7, 0.7], # Default thresholds for face detection
         factor=0.709, 
-        prewhiten=True,
+        #prewhiten=True,
         device=device
     )
     
@@ -41,7 +41,7 @@ mtcnn, resnet = load_models()
 
 # --- Main Embedding Function ---
 
-def get_face_embedding(image: Image):
+def get_face_embedding(image):
     """
     Takes a PIL Image, detects the face, and returns the embedding.
 
