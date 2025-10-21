@@ -8,7 +8,6 @@ from connection_db import supabase
 from utils.face_embedding import get_face_embedding
 from utils.g_spread import connect_to_gsheet, write_to_sheet
 
-
 try:
     sheet = connect_to_gsheet()
     if sheet is None:
@@ -20,15 +19,12 @@ except Exception as e:
 
 @st.cache_data(ttl=600) 
 def get_department_list():
-    
     try:
         response = supabase.table("department").select("dep_id, dep_name").order("dep_name").execute()
-        
         return response.data
-    
     except Exception as e:
         st.error(f"Could not fetch department list: {e}")
-        return ["Error: Could not load departments"]
+        return [] # Return empty list on error
 
 def show_registration_form():
     st.title("🎓 New Student Registration")
@@ -40,26 +36,25 @@ def show_registration_form():
     with st.form("student_registration_form"):
         st.subheader("Student Details")
         
-        s_name = st.text_input("Full Name ",placeholder="Rupam Mondal")
-        s_mail = st.text_input("Email " , placeholder="abc@gmail.com")
-        s_phone = st.text_input("Phone Number",placeholder="1524632890")
+        s_name = st.text_input("Full Name", placeholder="Rupam Mondal")
+        s_mail = st.text_input("Email", placeholder="abc@gmail.com")
+        s_phone = st.text_input("Phone Number", placeholder="1524632890")
         s_dob = st.date_input("Date of Birth")
         s_address = st.text_area("Address")
 
         col1, col2 = st.columns(2)
         
         with col1:
-            selected_department = col1.selectbox(
-                
+            selected_department = st.selectbox(
                 "Department", 
                 options=DEPARTMENTS, 
-                format_func=lambda dept: dept['dep_name']
+                # Use .get() for safety in case dep_name is missing
+                format_func=lambda dept: dept.get('dep_name', 'N/A')
             )
         
-        
-        
-        s_admisionYear = col2.number_input("Admission Year (S_admisionYear)",
-                                          current_year - 10, current_year, current_year)
+        with col2:
+            s_admisionYear = st.number_input("Admission Year",
+                                              current_year - 10, current_year, current_year)
     
         st.subheader("Live Face Photos")
         st.info("Provide 3 clear photos: Front, Left, and Right. (No hats or glasses)")
@@ -69,7 +64,7 @@ def show_registration_form():
         img_left = col_img2.camera_input("2. Left View", key="cam_left")
         img_right = col_img3.camera_input("3. Right View", key="cam_right")
 
-    submit_button = st.form_submit_button("Submit Registration")
+        submit_button = st.form_submit_button("Submit Registration")
 
     
     if submit_button:
@@ -83,7 +78,8 @@ def show_registration_form():
         else:
             with st.spinner("Analyzing photos... Please wait."):
                 all_embeddings = []
-                for i, img_buffer in enumerate(all_images):
+                image_buffers = [img_front, img_left, img_right]
+                for i, img_buffer in enumerate(image_buffers):
                     image = Image.open(img_buffer)
                     embedding, message = get_face_embedding(image)
                     
@@ -101,7 +97,7 @@ def show_registration_form():
                     "dep_id": selected_department['dep_id'],
                     "S_admisionYear": int(s_admisionYear),
                     "S_live_face_photos": all_embeddings,
-                    "S_dob": s_dob 
+                    "S_dob": str(s_dob)  # <-- IMPORTANT: Convert date to string
                 }
                 
                 success, message = write_to_sheet(sheet, student_data)
@@ -114,9 +110,16 @@ def show_registration_form():
 
 # --- 5. Main "Router" Logic ---
 try:
-    # Check the flag in Supabase. Assumes table has only one row with id=1
-    response = supabase.table("app_controls").select("is_registration_open").single().execute()
-    is_open = response.data.get("is_registration_open", False)
+    # --- THIS IS THE FIXED CODE BLOCK ---
+    # Fetch the list of results (even though there's only one)
+    response = supabase.table("app_controls").select("is_registration_open").execute()
+    
+    # Check if data was returned and get the value from the first dictionary
+    if response.data:
+        is_open = response.data[0].get("is_registration_open", False)
+    else:
+        is_open = False # Default to closed if no data is found
+    # ------------------------------------
 
     if is_open:
         show_registration_form()
