@@ -32,6 +32,10 @@ def show_registration_form():
 
     DEPARTMENTS = get_department_list()
     current_year = datetime.datetime.now().year
+    
+    max_dob = datetime.date(current_year - 15, 12, 31)
+    min_dob = datetime.date(current_year - 100, 1, 1)
+    default_dob = datetime.date(current_year - 20, 1, 1)
 
     with st.form("student_registration_form"):
         st.subheader("Student Details")
@@ -39,7 +43,7 @@ def show_registration_form():
         s_name = st.text_input("Full Name", placeholder="Rupam Mondal")
         s_mail = st.text_input("Email", placeholder="abc@gmail.com")
         s_phone = st.text_input("Phone Number", placeholder="1524632890")
-        s_dob = st.date_input("Date of Birth")
+        s_dob = st.date_input("Date of Birth",default_dob,min_value=min_dob,max_value=max_dob)
         s_address = st.text_area("Address")
 
         col1, col2 = st.columns(2)
