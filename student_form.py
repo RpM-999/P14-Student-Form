@@ -40,11 +40,11 @@ def show_registration_form():
     with st.form("student_registration_form"):
         st.subheader("Student Details")
         
-        s_name = st.text_input("Full Name (S_name)")
-        s_mail = st.text_input("Email (S_mail)")
-        s_phone = st.text_input("Phone Number (S_phone)")
-        s_dob = st.date_input("Date of Birth (S_dob)")
-        s_address = st.text_area("Address (S_Address)")
+        s_name = st.text_input("Full Name ",placeholder="Rupam Mondal")
+        s_mail = st.text_input("Email " , placeholder="abc@gmail.com")
+        s_phone = st.text_input("Phone Number",placeholder="1524632890")
+        s_dob = st.date_input("Date of Birth")
+        s_address = st.text_area("Address")
 
         col1, col2 = st.columns(2)
         
