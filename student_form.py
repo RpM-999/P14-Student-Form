@@ -18,13 +18,14 @@ except Exception as e:
     st.error(f"Error connecting to registration database: {e}")
     st.stop()
 
-@st.cache_data(ttl=600) # Cache the list for 10 minutes
+@st.cache_data(ttl=600) 
 def get_department_list():
-    """Fetches department names from the Supabase 'department' table."""
+    
     try:
-        response = supabase.table("department").select("dep_name").execute()
-        departments = [item['dep_name'] for item in response.data]
-        return departments
+        response = supabase.table("department").select("dep_id, dep_name").order("dep_name").execute()
+        
+        return response.data
+    
     except Exception as e:
         st.error(f"Could not fetch department list: {e}")
         return ["Error: Could not load departments"]
@@ -46,7 +47,17 @@ def show_registration_form():
         s_address = st.text_area("Address (S_Address)")
 
         col1, col2 = st.columns(2)
-        s_departname = col1.selectbox("Department (S_departname)", DEPARTMENTS)
+        
+        with col1:
+            selected_department = col1.selectbox(
+                
+                "Department", 
+                options=DEPARTMENTS, 
+                format_func=lambda dept: dept['dep_name']
+            )
+        
+        
+        
         s_admisionYear = col2.number_input("Admission Year (S_admisionYear)",
                                           current_year - 10, current_year, current_year)
     
@@ -62,7 +73,7 @@ def show_registration_form():
 
     
     if submit_button:
-        all_fields = [s_name, s_mail, s_phone, s_address, s_departname, s_admisionYear, s_dob]
+        all_fields = [s_name, s_mail, s_phone, s_address, selected_department, s_admisionYear, s_dob]
         all_images = [img_front, img_left, img_right]
 
         if not all(all_fields):
@@ -87,7 +98,7 @@ def show_registration_form():
                     "S_mail": s_mail,
                     "S_phone": s_phone,
                     "S_Address": s_address,
-                    "S_departname": s_departname,
+                    "dep_id": selected_department['dep_id'],
                     "S_admisionYear": int(s_admisionYear),
                     "S_live_face_photos": all_embeddings,
                     "S_dob": s_dob 
