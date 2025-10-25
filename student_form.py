@@ -37,7 +37,7 @@ def show_registration_form():
     min_dob = datetime.date(current_year - 100, 1, 1)
     default_dob = datetime.date(current_year - 20, 1, 1)
 
-    with st.form("student_registration_form"):
+    with st.form("student_registration_form",clear_on_submit=True):
         st.subheader("Student Details")
         
         s_name = st.text_input("Full Name", placeholder="Rupam Mondal")
@@ -59,23 +59,78 @@ def show_registration_form():
         with col2:
             s_admisionYear = st.number_input("Admission Year",
                                               current_year - 10, current_year, current_year)
+            
+        st.markdown("---")
     
         st.subheader("Live Face Photos")
         st.info("Provide 3 clear photos: Front, Left, and Right. (No hats or glasses)")
         
-        col_img1, col_img2, col_img3 = st.columns(3)
-        img_front = col_img1.camera_input("1. Front View", key="cam_front")
-        img_left = col_img2.camera_input("2. Left View", key="cam_left")
-        img_right = col_img3.camera_input("3. Right View", key="cam_right")
-
+        capture_label = ""
+        camera_key = ""
+        
+        if st.session_state.img_front_data is None:
+            capture_label = "1. Capture Front View"
+            camera_key = "cam_front_seq"
+        elif st.session_state.img_left_data is None:
+            capture_label = "2. Capture Left View"
+            camera_key = "cam_left_seq"
+        elif st.session_state.img_right_data is None:
+            capture_label = "3. Capture Right View"
+            camera_key = "cam_right_seq"
+        else:
+            st.success("All 3 photos captured!")
+            capture_label = None
+            
+        img_buffer = None
+        if capture_label:
+            img_buffer = st.camera_input(capture_label, key=camera_key)
+        
+        
+        st.write("Captured Photos:")
+        prev_col1, prev_col2, prev_col3 = st.columns(3)
+        with prev_col1:
+            if st.session_state.img_front_data:
+                st.image(st.session_state.img_front_data, caption="Front View", width=150)
+            else:
+                st.caption("Front View (Pending)")
+        with prev_col2:
+            if st.session_state.img_left_data:
+                st.image(st.session_state.img_left_data, caption="Left View", width=150)
+            else:
+                st.caption("Left View (Pending)")
+        with prev_col3:
+            if st.session_state.img_right_data:
+                st.image(st.session_state.img_right_data, caption="Right View", width=150)
+            else:
+                st.caption("Right View (Pending)")
+                
+        st.markdown("---")
         submit_button = st.form_submit_button("Submit Registration")
+        
+    if img_buffer is not None:
+        if camera_key == "cam_front_seq" and st.session_state.img_front_data is None:
+            st.session_state.img_front_data = img_buffer
+            st.rerun() # Rerun immediately to update previews and show next camera prompt
+        elif camera_key == "cam_left_seq" and st.session_state.img_left_data is None:
+            st.session_state.img_left_data = img_buffer
+            st.rerun()
+        elif camera_key == "cam_right_seq" and st.session_state.img_right_data is None:
+            st.session_state.img_right_data = img_buffer
+            st.rerun()
 
     
     if submit_button:
-        all_fields = [s_name, s_mail, s_phone, s_address, selected_department, s_admisionYear, s_dob]
+        
+        img_front = st.session_state.img_front_data
+        img_left = st.session_state.img_left_data
+        img_right = st.session_state.img_right_data
         all_images = [img_front, img_left, img_right]
+        
+        
+        all_text_fields = [s_name, s_mail, s_phone, s_address, selected_department, s_admisionYear, s_dob]
+        
 
-        if not all(all_fields):
+        if not all(all_text_fields):
             st.warning("Please fill in all student details.")
         elif not all(all_images):
             st.warning("Please take all 3 photos.")
@@ -83,6 +138,7 @@ def show_registration_form():
             with st.spinner("Analyzing photos... Please wait."):
                 all_embeddings = []
                 image_buffers = [img_front, img_left, img_right]
+                
                 for i, img_buffer in enumerate(image_buffers):
                     image = Image.open(img_buffer)
                     embedding, message = get_face_embedding(image)
@@ -109,6 +165,9 @@ def show_registration_form():
                 if success:
                     st.success("✅ Registration Submitted! An admin will review your application.")
                     st.balloons()
+                    st.session_state.img_front_data = None
+                    st.session_state.img_left_data = None
+                    st.session_state.img_right_data = None
                 else:
                     st.error(f"Registration Failed: {message}")
 
