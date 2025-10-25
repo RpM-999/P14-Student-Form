@@ -11,7 +11,6 @@ else:
         
         supabase: Client = create_client(url, anon_key)
         
-        # Store the connection in session state
         st.session_state.supabase = supabase
         
     except Exception as e:
