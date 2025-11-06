@@ -75,7 +75,7 @@ def show_registration_form():
         
         
         st.subheader("Live Face Photos")
-        st.info("Provide 3 clear photos: Front, Left, and Right. (No hats or glasses)")
+        st.info("Provide 3 clear photos: Front, Left, and Right. (No hats or glasses) .")
 
         img_front = st.camera_input("1. Capture Front View", key="cam_front")
         img_left = st.camera_input("2. Capture Left View", key="cam_left")
@@ -136,5 +136,6 @@ try:
     if response.data: is_open = response.data[0].get("is_registration_open", False)
     else: is_open = False
     if is_open: show_registration_form()
-    else: st.title("Registration Closed"), st.info("The form is not open.")
-except Exception as e: st.error(f"System error: {e}")
+    else: st.title("Registration Closed"), st.info("The registration form is not closed.")
+except Exception as e: 
+    st.info("concact with your respective HOD")
