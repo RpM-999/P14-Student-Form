@@ -111,7 +111,6 @@ streamlit run student_form.py
 
 	![Student record in sheet](Images/GOOGLESHEET.png)
 
-Store screenshots under `docs/` and update the image paths if you choose a different location.
 
 🔄 Workflow
 ----------
