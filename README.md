@@ -7,7 +7,7 @@ Student Registration Form (Streamlit + Supabase + Google Sheets)
 
 🧭 Overview
 -----------
-- Streamlit app for collecting new student registrations with three live camera photos (front, left, right) and generating face embeddings for identity verification.
+- Streamlit app for collecting new student registrations with three live camera photos (front, left, right) and generating face embeddings for facial recognition 
 - Supabase supplies dynamic data (department list, registration toggle) and persists session state for the client connection.
 - Google Sheets stores submitted student records, including serialized facial embeddings for downstream matching.
 
@@ -15,22 +15,17 @@ Student Registration Form (Streamlit + Supabase + Google Sheets)
 --------------
 - Guided student form with validation for required fields, bounded DOB, and admission year range.
 - Live camera capture for three angles and on-device face embedding via `facenet-pytorch` (InceptionResnetV1 + MTCNN).
-- Dynamic departments pulled from Supabase; registration availability controlled via `app_controls.is_registration_open`.
+- Dynamic departments pulled from Supabase; registration availability controlled via `app_controls.is_registration_open`which is controled by admin.
 - Writes ordered student rows to the `STUDENT-DETAILS` sheet with embeddings JSON-encoded.
 
 📁 Project Structure
 -------------------
-- App UI & flow: [student_form.py](student_form.py)
-- Supabase client bootstrap: [connection_db.py](connection_db.py)
-- Face detection & embeddings: [utils/face_embedding.py](utils/face_embedding.py)
-- Google Sheets integration: [utils/g_spread.py](utils/g_spread.py)
-- Python deps: [requirements.txt](requirements.txt)
-- Additional notes (empty by default): [DOCUMENTATION.md](DOCUMENTATION.md)
 
 🗺️ Visual map (feel free to replace with an image):
 
 ```
 P14-Student-Form
+├─ Images/                  # store project images
 ├─ student_form.py          # Streamlit app UI and flow
 ├─ connection_db.py         # Supabase bootstrap
 ├─ utils/
@@ -105,22 +100,23 @@ streamlit run student_form.py
 
 🖼️ Screenshots
 --------------
-- Form preview (replace with your capture):
+1)  **Student Registration Form preview :**
+   
+	![Student Information](Images/STUDENT_INFO.png)
 
-	![Student registration form](docs/form-ui.png)
+	![Student Face Images](Images/STUDENT_FACE.png)
+	
 
-- Google Sheet record view (replace with your capture):
+2) **Google Sheet record view :**
 
-	![Student record in sheet](docs/sheet-record.png)
+	![Student record in sheet](Images/GOOGLESHEET.png)
 
 Store screenshots under `docs/` and update the image paths if you choose a different location.
 
 🔄 Workflow
 ----------
-- Data entry ➜ Photo capture (front/left/right) ➜ Face embeddings ➜ Validation ➜ Save to Sheets
-- You can embed a visual pipeline here (replace with your own image):
 
-	![Project workflow](docs/workflow.png)
+![Project workflow](Images/WORKFLOW.png)
 
 🛟 Operational Notes
 -------------------
@@ -129,16 +125,14 @@ Store screenshots under `docs/` and update the image paths if you choose a diffe
 - If embeddings fail with “No face detected,” retake photos with a centered, well-lit face.
 - All secrets must be supplied through `.streamlit/secrets.toml`; avoid hard-coding keys.
 
-🔗 Live Demo
------------
-- (Optional) Publish your Streamlit app and link it here: https://share.streamlit.io/your-app
+
 
 📜 License
 ---------
-- Provide your license terms here (e.g., MIT, Apache-2.0).
+- ![License]()
 
 👩‍💻 Developed By
 -----------------
 - Rupam Mondal
-- Email: mailto:your-email@example.com
-- LinkedIn: https://www.linkedin.com/in/your-handle
+- Email: mailto:rupam.mondal2022@uem.edu.in
+- LinkedIn: https://www.linkedin.com/in/rupam-mondal-data-science
