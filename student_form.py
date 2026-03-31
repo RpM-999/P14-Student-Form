@@ -38,7 +38,7 @@ def show_registration_form():
     st.title("🎓 New Student Registration")
     st.write("Please fill in your details and provide three clear photos of your face.")
 
-    DEPARTMENTS = get_department_list()
+    departments = get_department_list()
     current_year = datetime.datetime.now().year
     
     
@@ -50,22 +50,23 @@ def show_registration_form():
     
     with st.form("student_registration_form", clear_on_submit=True):
         st.subheader("Student Details")
-        s_name = st.text_input("Full Name", placeholder="Rupam Mondal")
-        s_mail = st.text_input("Email", placeholder="abc@gmail.com")
-        s_phone = st.text_input("Phone Number", placeholder="1524632890")
+        s_name = st.text_input("Full Name *", placeholder="Rupam Mondal")
+        s_mail = st.text_input("Email *", placeholder="abc@gmail.com")
+        s_phone = st.text_input("Phone Number *", placeholder="1524632890")
         max_dob = datetime.date(current_year - 15, 12, 31)
         min_dob = datetime.date(current_year - 100, 1, 1)
         default_dob = datetime.date(current_year - 20, 1, 1)
-        s_dob = st.date_input("Date of Birth", value=default_dob, min_value=min_dob, max_value=max_dob)
-        s_address = st.text_area("Address")
+        s_dob = st.date_input("Date of Birth *", value=default_dob, min_value=min_dob, max_value=max_dob)
+        s_address = st.text_area("Address *")
         col1, col2 = st.columns(2)
         with col1:
             selected_department = st.selectbox(
-                "Department", options=DEPARTMENTS,
+                "Department", options=departments,
                 format_func=lambda dept: dept.get('dep_name', 'N/A')
             )
         with col2:
             s_admisionYear = st.number_input("Admission Year", current_year - 10, current_year, current_year)
+        dept_id = selected_department.get("dep_id") if selected_department else ""
         st.markdown("---")
 
 
@@ -87,7 +88,7 @@ def show_registration_form():
 
         if submitted:
 
-            all_text_fields_values = [s_name, s_mail, s_phone, s_address, selected_department, s_admisionYear, s_dob]
+            all_text_fields_values = [s_name, s_mail, s_phone, s_address, dept_id, s_admisionYear, s_dob]
             all_images = [img_front, img_left, img_right]
 
             
@@ -114,9 +115,14 @@ def show_registration_form():
 
                 with st.spinner("Saving registration..."):
                     student_data = {
-                        "S_name": s_name, "S_mail": s_mail, "S_phone": s_phone, "S_Address": s_address,
-                        "dep_id": selected_department['dep_id'], "S_admisionYear": int(s_admisionYear),
-                        "S_live_face_photos": all_embeddings, "S_dob": str(s_dob)
+                        "STUDENT_NAME": s_name, 
+                        "STUDENT_MAIL": s_mail, 
+                        "STUDENT_PHONE": s_phone,
+                        "STUDENT_DOB": str(s_dob), 
+                        "STUDENT_ADDRESS": s_address,
+                        "DEPARTMENT_ID": dept_id, 
+                        "STUDENT_ADMISSION_YEAR": int(s_admisionYear),
+                        "STUDENT_PHOTO_EMBEDDING": all_embeddings 
                     }
                     success, message = write_to_sheet(sheet, student_data)
                     if success:

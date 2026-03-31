@@ -23,9 +23,14 @@ def load_models():
     
     return mtcnn, resnet
 
-# --- Load Models on App Start ---
+# ----------------------------------------------------------------------------------
+#  Load Models on App Start
+# ----------------------------------------------------------------------------------
+
 # This line calls the cached function and makes the models globally available
 # in this script.
+
+
 mtcnn, resnet = load_models()
 
 

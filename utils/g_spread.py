@@ -3,7 +3,13 @@ import gspread
 from google.oauth2.service_account import Credentials
 import json
 
-SHEET_NAME = "STUDENT-DETAILS" # <-- Make sure this is your exact sheet name
+
+
+# <--------------------- Make sure this is your exact sheet name ----------------------------------->
+
+
+
+SHEET_NAME = "STUDENT DETAILS"                      
 
 @st.cache_resource(ttl=60)
 
@@ -28,10 +34,14 @@ def write_to_sheet(sheet, data_row: dict):
         
         if "S_live_face_photos" in data_row:
             data_row["S_live_face_photos"] = json.dumps(data_row["S_live_face_photos"])
+        if "STUDENT_PHOTO_EMBEDDING" in data_row:
+            data_row["STUDENT_PHOTO_EMBEDDING"] = json.dumps(data_row["STUDENT_PHOTO_EMBEDDING"])
         
         # Convert date to string
         if "S_dob" in data_row:
             data_row["S_dob"] = str(data_row["S_dob"])
+        if "STUDENT_DOB" in data_row:
+            data_row["STUDENT_DOB"] = str(data_row["STUDENT_DOB"])
 
         ordered_data = [data_row.get(h, "") for h in headers]
         sheet.append_row(ordered_data)
